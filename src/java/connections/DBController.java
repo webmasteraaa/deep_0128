@@ -11,18 +11,28 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.sql.*;
 
 /**
  *
  * @author TahanyFawzy
  */
-public class DBController implements DBHandler {
+public class DBController implements DBHandler 
+{
+public int Pid;
 
+    public void setPid(int Pid) {
+        this.Pid = Pid;
+    }
+
+    public int getPid() {
+        return Pid;
+    }
     Connection connection;
     PreparedStatement preparedStatement;
-    private static DBController instance = null;
-    private String username = "root";
-    private String password = "";
+    public static DBController instance = null;
+    public String username = "root";
+    public String password = "";
 
     public void setUsername(String username) {
         this.username = username;
@@ -32,7 +42,8 @@ public class DBController implements DBHandler {
         this.password = password;
     }
 
-    private DBController() {
+    public DBController() 
+    {
 
     }
 
@@ -282,22 +293,28 @@ public class DBController implements DBHandler {
         }
     }
 
-    @Override
-    public boolean deleteProduct(int productID) {
-        try {
-            preparedStatement = connection.prepareStatement("UPDATE `product` SET `valid`=0 WHERE `ID`=?");
-            preparedStatement.setInt(1, productID);
-            if (preparedStatement.executeUpdate() > 0) {
-                return removeFromShoppingCart(productID);
-            }
-            return false;
-            //return preparedStatement.executeUpdate() > 0;
-        } catch (SQLException ex) {
-            System.err.println("error in deleting product");
-            ex.printStackTrace();
-            return false;
+   @Override
+    public boolean deleteProduct()
+    {
+          // ResultSet rs=null;
+      //  ArrayList<Product> allProducts = new ArrayList<>();
+        try
+        {
+        Class.forName("com.mysql.jdbc.Driver");
+         Connection cn=DriverManager.getConnection("jdbc:mysql://localhost/shopping","root","");
+        Statement stmt=cn.createStatement();
+      String sql=("delete from product where ID='"+Pid+"'");
+      stmt.executeUpdate(sql);
+       return true;
         }
-    }
+        catch(Exception e)
+        {
+              e.printStackTrace();
+        }
+        return false;
+               
+            //return preparedStatement.executeUpdate() > 0;
+ }
 
     @Override
     public Category getCategory(int ID) {
@@ -352,6 +369,18 @@ public class DBController implements DBHandler {
             return null;
         }
     }
+    public ResultSet showproduct()throws Exception
+    {
+        ResultSet rs=null;
+      //  ArrayList<Product> allProducts = new ArrayList<>();
+        Class.forName("com.mysql.jdbc.Driver");
+         Connection cn=DriverManager.getConnection("jdbc:mysql://localhost/shopping","root","");
+        Statement stmt=cn.createStatement();
+      String sql=("select * from product");
+      rs=stmt.executeQuery(sql);
+        return rs;
+       // return rs;
+    }
 
     @Override
     public ArrayList<Product> getProductsCategory(int categoryID) {
@@ -375,24 +404,27 @@ public class DBController implements DBHandler {
     }
 
     @Override
-    public boolean editProduct(int old, Product neww) {
-        try {
-            preparedStatement = connection.prepareStatement("UPDATE `product` SET `categoryID`=?,"
-                    + "`name`=?,`description`=?,`quantity`=?,`price`=?,`images`=? WHERE `ID`=?");
-            preparedStatement.setInt(1, neww.getCategory().getCategoryID());
-            preparedStatement.setString(2, neww.getName());
-            preparedStatement.setString(3, neww.getDescription());
-            preparedStatement.setInt(4, neww.getQuantity());
-            preparedStatement.setDouble(5, neww.getPrice());
-            preparedStatement.setString(6, neww.getImages());
-            preparedStatement.setInt(7, old);
-
-            return preparedStatement.executeUpdate() > 0;
-        } catch (SQLException ex) {
-            System.err.println("error in editiing product");
-            ex.printStackTrace();
-            return false;
-        }
+    public ResultSet editProduct()
+    {
+        
+         ResultSet rs=null;
+    
+    try {
+        
+        Class.forName("com.mysql.jdbc.Driver");
+         Connection cn=DriverManager.getConnection("jdbc:mysql://localhost/shopping","root","");
+        Statement stmt=cn.createStatement();
+      String sql=("select * from product where ID='"+Pid+"'");
+      rs=stmt.executeQuery(sql);
+        return rs;
+    } catch (ClassNotFoundException ex) {
+        Logger.getLogger(DBController.class.getName()).log(Level.SEVERE, null, ex);
+    } catch (SQLException ex) {
+        Logger.getLogger(DBController.class.getName()).log(Level.SEVERE, null, ex);
+    }
+   
+        return rs;
+       // return rs;
     }
 
     @Override
