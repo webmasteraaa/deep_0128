@@ -63,6 +63,18 @@ public int Pid;
         }
         return instance;
     }
+    public ResultSet showproduct()throws Exception
+    {
+        ResultSet rs=null;
+      //  ArrayList<Product> allProducts = new ArrayList<>();
+        Class.forName("com.mysql.jdbc.Driver");
+         Connection cn=DriverManager.getConnection("jdbc:mysql://localhost/shopping","root","");
+        Statement stmt=cn.createStatement();
+      String sql=("select * from product");
+      rs=stmt.executeQuery(sql);
+        return rs;
+       // return rs;
+    }
 
     @Override
     public boolean insertCategorey(String name) {
